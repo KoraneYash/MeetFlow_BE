@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum ParticipantStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  avatar      String?
+  timezone    String   @default("Asia/Kolkata")
+  role        Role     @default(USER)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  availability Availability[]
+  meetings     Meeting[]     @relation("OrganizerMeetings")
+  participants Participant[]
+}
+
+model Availability {
+  id            String   @id @default(uuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  dayOfWeek     Int
+  startTime     String
+  endTime       String
+
+  slotDuration  Int      @default(30)
+  breakDuration Int      @default(0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Meeting {
+  id            String        @id @default(uuid())
+
+  organizerId   String
+  organizer     User          @relation("OrganizerMeetings", fields: [organizerId], references: [id], onDelete: Cascade)
+
+  title         String
+  description   String?
+
+  startTime     DateTime
+  endTime       DateTime
+
+  location      String?
+  meetingLink   String?
+
+  status        MeetingStatus @default(SCHEDULED)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  participants  Participant[]
+
+  @@index([organizerId])
+  @@index([startTime])
+}
+
+model Participant {
+  id          String            @id @default(uuid())
+
+  meetingId   String
+  meeting     Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  userId      String?
+  user        User?             @relation(fields: [userId], references: [id])
+
+  guestName   String?
+  guestEmail  String?
+
+  status      ParticipantStatus @default(PENDING)
+
+  createdAt   DateTime          @default(now())
+
+  @@index([meetingId])
+  @@index([userId])
+}
