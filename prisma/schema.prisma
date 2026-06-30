@@ -58,6 +58,7 @@ model Availability {
   updatedAt     DateTime @updatedAt
 
   @@index([userId])
+  @@unique([userId, dayOfWeek])
 }
 
 model Meeting {
@@ -104,4 +105,5 @@ model Participant {
 
   @@index([meetingId])
   @@index([userId])
+  @@unique([meetingId, guestEmail])
 }

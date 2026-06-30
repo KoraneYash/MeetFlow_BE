@@ -93,6 +93,7 @@ const login = async (req, res) => {
       {
         id: user.id,
         email: user.email,
+        timezone: user.timezone
       },
       process.env.JWT_SECRET,
       {

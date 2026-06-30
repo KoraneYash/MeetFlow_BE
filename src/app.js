@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/auth.routes")
-
+const availabilityRoutes = require("./routes/availability.routes");
+const meetingRoutes = require("./routes/meeting.routes");
+const participantRoutes = require("./routes/participant.routes")
 
 const app = express();
 
@@ -19,5 +21,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes)
+
+app.use("/api/availability", availabilityRoutes);
+
+app.use("/api/meetings", meetingRoutes);
+
+app.use("/api/participants",participantRoutes);
 
 module.exports = app;
